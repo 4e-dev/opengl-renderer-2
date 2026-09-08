@@ -2,6 +2,7 @@
 
 ## Dependencies
 * gcc compiler
-* meson build tool (https://mesonbuild.com/)
 
 ## Instructions
+Directly run the Makefile via `make`, the game executable will 
+be generated at the root.
