@@ -1,3 +1,8 @@
+# binaries (ignores anything without an extension
+*
+!*.*
+!*/
+
 # Prerequisites
 *.d
 
