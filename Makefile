@@ -1,6 +1,9 @@
 # compiler settings
 CXX=clang++
+CC=clang
+
 CXXFLAGS=-Wall -Wextra -Wpedantic -std=c++23
+CFLAGS=-Wall -Wextra -Wpedantic
 
 # paths
 BUILD_PATH=build
@@ -11,20 +14,33 @@ SRC_PATH=src
 # executable
 BIN_NAME=game
 
-# find every .cpp file under src/
-SOURCES=$(wildcard $(SRC_PATH)/*.cpp)
+# libraries
+LDFLAGS=-L$(LIB_PATH)/glfw
+LDLIBS=-lglfw3 -lGL -lX11 -lpthread -lXrandr -lXi -ldl
 
-# replace every .cpp name with its .o counterpart
-OBJECTS=$(SOURCES:$(SRC_PATH)/%.cpp=$(BUILD_PATH)/%.o)
+# source files
+CPP_SOURCES=$(wildcard $(SRC_PATH)/*.cpp)
+C_SOURCES=$(wildcard $(SRC_PATH)/*.c)
 
-# executable
+# object files
+CPP_OBJECTS=$(CPP_SOURCES:$(SRC_PATH)/%.cpp=$(BUILD_PATH)/%.o)
+C_OBJECTS=$(C_SOURCES:$(SRC_PATH)/%.c=$(BUILD_PATH)/%.o)
+
+OBJECTS=$(CPP_OBJECTS) $(C_OBJECTS)
+
+# link object files into executable
 $(BIN_NAME): $(OBJECTS)
-	$(CXX) $(OBJECTS) -o $@
+	$(CXX) $(OBJECTS) $(LDFLAGS) $(LDLIBS) -o $@
 
-# compilation step (.cpp to .o)
+# compile c++ files
 $(BUILD_PATH)/%.o: $(SRC_PATH)/%.cpp
 	@mkdir -p $(BUILD_PATH)
 	$(CXX) $(CXXFLAGS) -I$(INCLUDE_PATH) -c $< -o $@
+
+# compile c files
+$(BUILD_PATH)/%.o: $(SRC_PATH)/%.c
+	@mkdir -p $(BUILD_PATH)
+	$(CC) $(CFLAGS) -I$(INCLUDE_PATH) -c $< -o $@
 
 # cleanup
 .PHONY: clean
