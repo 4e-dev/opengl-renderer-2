@@ -61,3 +61,6 @@ builddir/
 # test output & cache
 Testing/
 .cache/
+
+# lsp
+compile_commands.json
