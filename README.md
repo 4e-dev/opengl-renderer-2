@@ -1,5 +1,4 @@
-# Title: Retail Sim
-## Developer: 4E Studios
+# OpenGL Renderer 2
 
 ## Building from source
 
