@@ -2,14 +2,13 @@
 
 ## Building from source
 
-Dependencies
+Dependencies:
 * gcc compiler
     * it must support c++23
 
-Instructions
-Directly run the Makefile via `make`, the game executable will 
-be generated at the root. Game objects are likely to be built
-in /build (refer to the Makefile).
+Building from source:
+1. `make` or `make game` to build the game binary
+2. `make test` to build the testing binary (outputs as 'runtest')
 
 ## LSP
 `bear -- make` generates a compile_commands.json
