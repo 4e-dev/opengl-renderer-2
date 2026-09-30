@@ -105,7 +105,7 @@ struct Vec2
     }
 
     // multiplication
-    Vec2 operator*(const Vec2& V)
+    Vec2 hadamard_mult(const Vec2& V)
     {
         return Vec2
         {
@@ -113,14 +113,9 @@ struct Vec2
             y * V.y
         };
     }
-    void operator*=(const Vec2& V)
-    {
-        x *= V.x;
-        y *= V.y;
-    }
 
     // division
-    Vec2 operator/(const Vec2& V)
+    Vec2 hadamard_div(const Vec2& V)
     {
         return Vec2
         {
@@ -128,13 +123,6 @@ struct Vec2
             y / V.y
         };
     }
-    void operator/=(const Vec2& V)
-    {
-        x /= V.x;
-        y /= V.y;
-    }
-
-    double dot 
 };
 
 struct Vec3
@@ -202,7 +190,7 @@ struct Vec3
     }
 
     // multiplication
-    Vec3 operator*(const Vec3& V)
+    Vec3 hadamard_mult(const Vec3& V)
     {
         return Vec3
         {
@@ -211,15 +199,9 @@ struct Vec3
             z * V.z
         };
     }
-    void operator*=(const Vec3& V)
-    {
-        x *= V.x;
-        y *= V.y;
-        z *= V.z;
-    }
 
     // division
-    Vec3 operator/(const Vec3& V)
+    Vec3 hadamard_div(const Vec3& V)
     {
         return Vec3
         {
@@ -227,12 +209,6 @@ struct Vec3
             y / V.y,
             z / V.z
         };
-    }
-    void operator/=(const Vec3& V)
-    {
-        x /= V.x;
-        y /= V.y;
-        z /= V.z;
     }
 };
 
@@ -309,7 +285,7 @@ struct Vec4
     }
 
     // multiplication
-    Vec4 operator*(const Vec4& V)
+    Vec4 hadamard_mult(const Vec4& V)
     {
         return Vec4
         {
@@ -319,16 +295,9 @@ struct Vec4
             w * V.w
         };
     }
-    void operator*=(const Vec4& V)
-    {
-        x *= V.x;
-        y *= V.y;
-        z *= V.z;
-        w *= V.w;
-    }
 
     // division
-    Vec4 operator/(const Vec4& V)
+    Vec4 hadamard_div(const Vec4& V)
     {
         return Vec4
         {
@@ -337,12 +306,5 @@ struct Vec4
             z / V.z,
             w / V.w
         };
-    }
-    void operator/=(const Vec4& V)
-    {
-        x /= V.x;
-        y /= V.y;
-        z /= V.z;
-        w /= V.w;
     }
 };

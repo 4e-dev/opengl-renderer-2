@@ -74,7 +74,7 @@ namespace TestVec2
         return true;
     }
 
-    bool mult()
+    bool hadamard_mult()
     {
         const ar2 x{1.0, 2.0};
         const ar2 y{3.0, 5.0};
@@ -87,17 +87,10 @@ namespace TestVec2
             x[1] * y[1]
         };
 
-        if (a * b != c)
-            return false;
-
-        a *= b;
-        if (a != c)
-            return false;
-
-        return true;
+        return a.hadamard_mult(b) == c;
     }
 
-    bool div()
+    bool hadamard_div()
     {
         const ar2 x{1.0, 2.0};
         const ar2 y{3.0, 5.0};
@@ -110,14 +103,7 @@ namespace TestVec2
             x[1] / y[1]
         };
 
-        if (a / b != c)
-            return false;
-
-        a /= b;
-        if (a != c)
-            return false;
-
-        return true;
+        return a.hadamard_div(b) == c;
     }
 } // namespace TestVec2
 
@@ -184,7 +170,7 @@ namespace TestVec3 {
         return true;
     }
 
-    bool mult()
+    bool hadamard_mult()
     {
         const ar3 x{1.0, 2.0, 3.0};
         const ar3 y{5.0, 8.0, 13.0};
@@ -198,17 +184,10 @@ namespace TestVec3 {
             x[2] * y[2],
         };
 
-        if (a * b != c)
-            return false;
-
-        a *= b;
-        if (a != c)
-            return false;
-
-        return true;
+        return a.hadamard_mult(b) == c;
     }
 
-    bool div()
+    bool hadamard_div()
     {
         const ar3 x{1.0, 2.0, 3.0};
         const ar3 y{5.0, 8.0, 13.0};
@@ -222,14 +201,7 @@ namespace TestVec3 {
             x[2] / y[2],
         };
 
-        if (a / b != c)
-            return false;
-
-        a /= b;
-        if (a != c)
-            return false;
-
-        return true;
+        return a.hadamard_div(b) == c;
     }
 } // namespace TestVec3
 
@@ -298,7 +270,7 @@ namespace TestVec4 {
         return true;
     }
 
-    bool mult()
+    bool hadamard_mult()
     {
         const ar4 x{1.0, 2.0, 3.0, 5.0};
         const ar4 y{8.0, 13.0, 21.0, 34.0};
@@ -313,17 +285,10 @@ namespace TestVec4 {
             x[3] * y[3]
         };
 
-        if (a * b != c)
-            return false;
-
-        a *= b;
-        if (a != c)
-            return false;
-
-        return true;
+        return a.hadamard_mult(b) == c;
     }
 
-    bool div()
+    bool hadamard_div()
     {
         const ar4 x{1.0, 2.0, 3.0, 5.0};
         const ar4 y{8.0, 13.0, 21.0, 34.0};
@@ -338,14 +303,7 @@ namespace TestVec4 {
             x[3] / y[3]
         };
 
-        if (a / b != c)
-            return false;
-
-        a /= b;
-        if (a != c)
-            return false;
-
-        return true;
+        return a.hadamard_div(b) == c;
     }
 } // namespace TestVec4
 
@@ -361,12 +319,12 @@ int run_test_linear_algebra()
         {"Vec2::sub", TestVec2::sub},
         {"Vec3::sub", TestVec3::sub},
         {"Vec4::sub", TestVec4::sub},
-        {"Vec2::mult", TestVec2::mult},
-        {"Vec3::mult", TestVec3::mult},
-        {"Vec4::mult", TestVec4::mult},
-        {"Vec2::div", TestVec2::div},
-        {"Vec3::div", TestVec3::div},
-        {"Vec4::div", TestVec4::div}
+        {"Vec2::hadamard_mult", TestVec2::hadamard_mult},
+        {"Vec3::hadamard_mult", TestVec3::hadamard_mult},
+        {"Vec4::hadamard_mult", TestVec4::hadamard_mult},
+        {"Vec2::hadamard_div", TestVec2::hadamard_div},
+        {"Vec3::hadamard_div", TestVec3::hadamard_div},
+        {"Vec4::hadamard_div", TestVec4::hadamard_div}
     };
 
     int num_tests_failed {0};
