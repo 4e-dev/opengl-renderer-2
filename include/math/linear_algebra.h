@@ -14,11 +14,18 @@
 #define STATIC_INLINE static inline
 #endif
 
+// FIXME: The multiplication and divison operations are HADAMARD ops.
+//  Not technically correct for the use case. Replace so that  
+//  operation* and operation/, and other respective overloads, so that
+//  they represent vector (x) scalar.
+
+// Just rename the current overloaded operations as *hadamard-mult* and *hadamard-div*
+
 /*
    TODO: version 1.0 targets to implement.
 
     Vec2 ─┐
-    Vec3 ─┼─ arithmetic (add, subtract, multiply, divide)
+    Vec3 ─┼─ arithmetic (add, subtract, multiply, divide) [x]
     Vec4 ─┘
         ├─ dot
         ├─ cross (Vec3)
@@ -48,7 +55,6 @@
         └── transform_point/vector
         */
 
-// vector datatypes
 struct Vec2
 {
     double x, y;
@@ -127,6 +133,8 @@ struct Vec2
         x /= V.x;
         y /= V.y;
     }
+
+    double dot 
 };
 
 struct Vec3
