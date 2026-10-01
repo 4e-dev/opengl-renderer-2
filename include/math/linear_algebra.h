@@ -14,15 +14,17 @@
 #define STATIC_INLINE static inline
 #endif
 
+// TODO: create test cases for the mult/div scalar functions...
+
 // FIXME: The multiplication and divison operations are HADAMARD ops.
-//  Not technically correct for the use case. Replace so that  
+//  Not technically correct for the use case. Replace so that
 //  operation* and operation/, and other respective overloads, so that
 //  they represent vector (x) scalar.
 
 // Just rename the current overloaded operations as *hadamard-mult* and *hadamard-div*
 
 /*
-   TODO: version 1.0 targets to implement.
+   Version 1.0 targets to implement.
 
     Vec2 ─┐
     Vec3 ─┼─ arithmetic (add, subtract, multiply, divide) [x]
@@ -68,6 +70,7 @@ struct Vec2
         return x == V.x
             && y == V.y;
     }
+
     bool operator!=(const Vec2& V) const
     {
         return x != V.x
@@ -83,6 +86,7 @@ struct Vec2
             y + V.y
         };
     }
+
     void operator+=(const Vec2& V)
     {
         x += V.x;
@@ -98,6 +102,7 @@ struct Vec2
             y - V.y
         };
     }
+
     void operator-=(const Vec2& V)
     {
         x -= V.x;
@@ -105,6 +110,21 @@ struct Vec2
     }
 
     // multiplication
+    Vec2 operator*(const double scalar) const
+    {
+        return Vec2
+        {
+            x * scalar,
+            y * scalar
+        };
+    }
+
+    void operator*=(const double scalar)
+    {
+        x *= scalar;
+        y *= scalar;
+    }
+
     Vec2 hadamard_mult(const Vec2& V)
     {
         return Vec2
@@ -115,6 +135,21 @@ struct Vec2
     }
 
     // division
+    Vec2 operator/(const double scalar) const
+    {
+        return Vec2
+        {
+            x / scalar,
+            y / scalar,
+        };
+    }
+
+    void operator/=(const double scalar)
+    {
+        x /= scalar;
+        y /= scalar;
+    }
+
     Vec2 hadamard_div(const Vec2& V)
     {
         return Vec2
@@ -123,17 +158,19 @@ struct Vec2
             y / V.y
         };
     }
-};
+}; // struct Vec2
 
 struct Vec3
 {
     double x, y, z;
+
     Vec3()
     {
         x = 0.0;
         y = 0.0;
         z = 0.0;
     }
+
     Vec3(const double x, const double y, const double z)
     {
         this->x = x;
@@ -148,6 +185,7 @@ struct Vec3
             && y == V.y
             && z == V.z;
     }
+
     bool operator!=(const Vec3& V) const
     {
         return x != V.x
@@ -190,6 +228,23 @@ struct Vec3
     }
 
     // multiplication
+    Vec3 operator*(const double scalar) const
+    {
+        return Vec3
+        {
+            x * scalar,
+            y * scalar,
+            z * scalar
+        };
+    }
+
+    void operator*=(const double scalar)
+    {
+        x *= scalar;
+        y *= scalar;
+        z *= scalar;
+    }
+
     Vec3 hadamard_mult(const Vec3& V)
     {
         return Vec3
@@ -201,6 +256,23 @@ struct Vec3
     }
 
     // division
+    Vec3 operator/(const double scalar) const
+    {
+        return Vec3
+        {
+            x / scalar,
+            y / scalar,
+            z / scalar
+        };
+    }
+
+    void operator/=(const double scalar)
+    {
+        x /= scalar;
+        y /= scalar;
+        z /= scalar;
+    }
+
     Vec3 hadamard_div(const Vec3& V)
     {
         return Vec3
@@ -210,7 +282,7 @@ struct Vec3
             z / V.z
         };
     }
-};
+}; // struct Vec3
 
 struct Vec4
 {
@@ -285,6 +357,24 @@ struct Vec4
     }
 
     // multiplication
+    Vec4 operator*(const double scalar) const
+    {
+        return Vec4
+        {
+            x * scalar,
+            y * scalar,
+            z * scalar,
+            w * scalar
+        };
+    }
+
+    void operator*=(const double scalar)
+    {
+        x *= scalar;
+        y *= scalar;
+        z *= scalar;
+        w *= scalar;
+    }
     Vec4 hadamard_mult(const Vec4& V)
     {
         return Vec4
@@ -297,6 +387,25 @@ struct Vec4
     }
 
     // division
+    Vec4 operator/(const double scalar) const
+    {
+        return Vec4
+        {
+            x / scalar,
+            y / scalar,
+            z / scalar,
+            w / scalar
+        };
+    }
+
+    void operator/=(const double scalar)
+    {
+        x /= scalar;
+        y /= scalar;
+        z /= scalar;
+        w /= scalar;
+    }
+
     Vec4 hadamard_div(const Vec4& V)
     {
         return Vec4
@@ -307,4 +416,4 @@ struct Vec4
             w / V.w
         };
     }
-};
+}; // struct Vec4

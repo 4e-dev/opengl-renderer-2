@@ -1,7 +1,7 @@
 #include "math/linear_algebra.h"
 #include "tests/test_linear_algebra.h"
 
-// TODO: throw this into a base test class...
+// FIXME: likely need to throw this into a base test class...
 using Test = bool(*)(); // pointer to a function that returns a bool.
 struct TestCase {
     std::string name;
@@ -105,6 +105,30 @@ namespace TestVec2
 
         return a.hadamard_div(b) == c;
     }
+
+    bool scalar_mult()
+    {
+        const Vec2 a{1.0, 2.0};
+        const double scalar = 69.69;
+        const Vec2 b
+        {
+            a.x * scalar,
+            a.y * scalar
+        };
+        return a * scalar == b;
+    }
+
+    bool scalar_div()
+    {
+        const Vec2 a{1.0, 2.0};
+        const double scalar = 69.69;
+        const Vec2 b
+        {
+            a.x / scalar,
+            a.y / scalar
+        };
+        return a / scalar == b;
+    }
 } // namespace TestVec2
 
 namespace TestVec3 {
@@ -202,6 +226,32 @@ namespace TestVec3 {
         };
 
         return a.hadamard_div(b) == c;
+    }
+
+    bool scalar_mult()
+    {
+        const Vec3 a{1.0, 2.0, 3.0};
+        const double scalar = 69.69;
+        const Vec3 b
+        {
+            a.x * scalar,
+            a.y * scalar,
+            a.z * scalar
+        };
+        return a * scalar == b;
+    }
+
+    bool scalar_div()
+    {
+        const Vec3 a{1.0, 2.0, 3.0};
+        const double scalar = 69.69;
+        const Vec3 b
+        {
+            a.x / scalar,
+            a.y / scalar,
+            a.z / scalar
+        };
+        return a / scalar == b;
     }
 } // namespace TestVec3
 
@@ -305,6 +355,34 @@ namespace TestVec4 {
 
         return a.hadamard_div(b) == c;
     }
+
+    bool scalar_mult()
+    {
+        const Vec4 a{1.0, 2.0, 3.0, 5.0};
+        const double scalar = 69.69;
+        const Vec4 b
+        {
+            a.x * scalar,
+            a.y * scalar,
+            a.z * scalar,
+            a.w * scalar
+        };
+        return a * scalar == b;
+    }
+
+    bool scalar_div()
+    {
+        const Vec4 a{1.0, 2.0, 3.0, 5.0};
+        const double scalar = 69.69;
+        const Vec4 b
+        {
+            a.x / scalar,
+            a.y / scalar,
+            a.z / scalar,
+            a.w / scalar
+        };
+        return a / scalar == b;
+    }
 } // namespace TestVec4
 
 int run_test_linear_algebra()
@@ -324,7 +402,13 @@ int run_test_linear_algebra()
         {"Vec4::hadamard_mult", TestVec4::hadamard_mult},
         {"Vec2::hadamard_div", TestVec2::hadamard_div},
         {"Vec3::hadamard_div", TestVec3::hadamard_div},
-        {"Vec4::hadamard_div", TestVec4::hadamard_div}
+        {"Vec4::hadamard_div", TestVec4::hadamard_div},
+        {"Vec2::scalar_mult", TestVec2::scalar_mult},
+        {"Vec3::scalar_mult", TestVec3::scalar_mult},
+        {"Vec4::scalar_mult", TestVec4::scalar_mult},
+        {"Vec2::scalar_div", TestVec2::scalar_div},
+        {"Vec3::scalar_div", TestVec3::scalar_div},
+        {"Vec4::scalar_div", TestVec4::scalar_div}
     };
 
     int num_tests_failed {0};
