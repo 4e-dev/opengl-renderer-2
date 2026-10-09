@@ -1,438 +1,251 @@
 #include "math/linear_algebra.h"
 #include "tests/test_linear_algebra.h"
+#include "util/log.h"
 
-// FIXME: likely need to throw this into a base test class...
-using Test = bool(*)(); // pointer to a function that returns a bool.
+using Test = bool(*)();
 struct TestCase {
-    std::string name;
-    Test test;
+    std::string description;
+    Test run;
 };
 
-using ar2 = std::array<double, 2>;
-using ar3 = std::array<double, 3>;
-using ar4 = std::array<double, 4>;
+// random number generator
+std::random_device random_device{};
+std::mt19937 gen(random_device());
+std::uniform_real_distribution<double> distrib(1.0, 100.0);
 
-namespace TestVec2
-{
-    bool equal()
-    {
-        const ar2 x{1.0, 2.0};
-        const ar2 y{3.0, 5.0};
+// -----------------------------
 
-        if (x != x)
+template <size_t N>
+bool test_default_ctor() {
+    Vec<N> v{};
+    for (size_t i{0}; i < N; ++i)
+        if (v[i] != 0.0)
             return false;
+    return true;
+}
 
-        if (x == y || y == x)
+template <size_t N>
+bool test_arr_ctor() {
+    std::array<double, N> a;
+    for (size_t i{0}; i < N; ++i)
+        a[i] = distrib(gen);
+    Vec<N> v(a);
+    for (size_t i{0}; i < N; ++i)
+        if (v[i] != a[i])
             return false;
+    return true;
+}
 
-        return x != y && y != x;
-    }
+template <size_t N>
+bool test_bracket() {
+    // fill with random numbers
+    std::array<double, N> a;
+    for (size_t i{0}; i < N; ++i)
+        a[i] = distrib(gen);
 
-    bool add()
-    {
-        const ar2 x{1.0, 2.0};
-        const ar2 y{3.0, 5.0};
-
-        Vec2 a{x[0], x[1]};
-        Vec2 b{y[0], y[1]};
-        Vec2 c
-        {
-            x[0] + y[0],
-            x[1] + y[1]
-        };
-
-        if (a + b != c)
+    Vec<N> v(a);
+    for (size_t i{0}; i < N; ++i)
+        if (v[i] != a[i])
             return false;
+    return true;
+}
 
-        a += b;
-        if (a != c)
+template <size_t N>
+bool test_accessor() {
+    // fill with random numbers
+    std::array<double, N> a;
+    for (size_t i{0}; i < N; ++i)
+        a[i] = distrib(gen);
+
+    Vec<N> v(a);
+
+    bool x = true;
+    bool y = true;
+    bool z = true;
+    bool w = true;
+
+    x = v.x() == a[0];
+    if constexpr (N >= 2) y = v.y() == a[1];
+    if constexpr (N >= 3) z = v.z() == a[2];
+    if constexpr (N >= 4) w = v.w() == a[3];
+
+    return x && y && z && w;
+}
+
+template <size_t N>
+bool test_equality() {
+    // fill with random numbers
+    std::array<double, N> a;
+    for (size_t i{0}; i < N; ++i)
+        a[i] = distrib(gen);
+
+    Vec<N> v1(a), v2(a);
+    return v1 == v2;
+}
+
+template <size_t N>
+bool test_inequality() {
+    Vec<N> v1{}, v2{};
+    for (size_t i{0}; i < N; ++i) {
+        v1[i] = static_cast<double>(i);
+        v2[i] = static_cast<double>(i*2);
+    }
+    return v1 != v2;
+}
+
+template <size_t N>
+bool test_addition() {
+    std::array<double, N> a1{}, a2{}, a3{};
+    for (size_t i{0}; i < N; ++i) {
+        a1[i] = distrib(gen);
+        a2[i] = distrib(gen);
+        a3[i] = a1[i] + a2[i];
+    }
+
+    Vec<N> v1(a1), v2(a2), v3(a3);
+    return v1 + v2 == v3;
+}
+
+template <size_t N>
+bool test_subtraction() {
+    std::array<double, N> a1{}, a2{}, a3{};
+    for (size_t i{0}; i < N; ++i) {
+        a1[i] = distrib(gen);
+        a2[i] = distrib(gen);
+        a3[i] = a1[i] - a2[i];
+    }
+
+    Vec<N> v1(a1), v2(a2), v3(a3);
+    return v1 - v2 == v3;
+}
+
+template <size_t N>
+bool test_scalar_mult() {
+    const double scalar = distrib(gen);
+    std::array<double, N> a1{}, a2{};
+    for (size_t i{0}; i < N; ++i) {
+        a1[i] = distrib(gen);
+        a2[i] = a1[i] * scalar;
+    }
+
+    Vec<N> v1(a1), v2(a2);
+    return (v1 * scalar == v2) && (scalar * v1 == v2);
+}
+
+template <size_t N>
+bool test_scalar_div() {
+    const double scalar = distrib(gen);
+    std::array<double, N> a1{}, a2{};
+    for (size_t i{0}; i < N; ++i) {
+        a1[i] = distrib(gen);
+        a2[i] = a1[i] / scalar;
+    }
+    Vec<N> v1(a1), v2(a2);
+    return v1 / scalar == v2;
+}
+
+template <size_t N>
+bool test_component_mult() {
+    std::array<double, N> a1{}, a2{}, a3{};
+    for (size_t i{0}; i < N; ++i) {
+        a1[i] = distrib(gen);
+        a2[i] = distrib(gen);
+        a3[i] = a1[i] * a2[i];
+    }
+    Vec<N> v1(a1), v2(a2), v3(a3);
+    return component_multiply(v1, v2) == v3;
+}
+
+template <size_t N>
+bool test_component_div() {
+    std::array<double, N> a1{}, a2{}, a3{};
+    for (size_t i{0}; i < N; ++i) {
+        a1[i] = distrib(gen);
+        a2[i] = distrib(gen);
+        a3[i] = a1[i] / a2[i];
+    }
+    Vec<N> v1(a1), v2(a2), v3(a3);
+    return component_divide(v1, v2) == v3;
+}
+
+template <size_t N>
+bool test_dot() {
+    std::array<double, N> a1{}, a2{};
+    for (size_t i{0}; i < N; ++i) {
+        a1[i] = distrib(gen);
+        a2[i] = distrib(gen);
+    }
+
+    Vec<N> v1(a1), v2(a2);
+    double expected{};
+    for (size_t i{0}; i < N; ++i) {
+        expected += a1[i] * a2[i];
+    }
+    return dot(v1, v2) == expected;
+}
+
+template <size_t N>
+bool test_distance() {
+    std::array<double, N> a1{}, a2{};
+    for (size_t i{0}; i < N; ++i) {
+        a1[i] = static_cast<double>(i);
+        a2[i] = static_cast<double>(i + 1);
+    }
+    Vec<N> v1(a1), v2(a2);
+    return distance(v1, v2) == std::sqrt(static_cast<double>(N));
+}
+
+template <size_t N>
+bool test_lerp() {
+    std::array<double, N> a1{}, a2{};
+    for (size_t i{0}; i < N; ++i) {
+        a1[i] = static_cast<double>(i);
+        a2[i] = static_cast<double>(i + 2);
+    }
+
+    Vec<N> v1(a1), v2(a2);
+    Vec<N> result = lerp(v1, v2, 0.5);
+
+    for (size_t i{0}; i < N; ++i) {
+        double expected {(a1[i] + a2[i]) / 2.0};
+        if (result[i] != expected)
             return false;
-
-        return true;
     }
+    return true;
+}
 
-    bool sub()
-    {
-        const ar2 x{1.0, 2.0};
-        const ar2 y{3.0, 5.0};
-
-        Vec2 a{x[0], x[1]};
-        Vec2 b{y[0], y[1]};
-        Vec2 c
-        {
-            x[0] - y[0],
-            x[1] - y[1]
-        };
-
-        if (a - b != c)
-            return false;
-
-        a -= b;
-        if (a != c)
-            return false;
-
-        return true;
-    }
-
-    bool hadamard_mult()
-    {
-        const ar2 x{1.0, 2.0};
-        const ar2 y{3.0, 5.0};
-
-        Vec2 a{x[0], x[1]};
-        Vec2 b{y[0], y[1]};
-        Vec2 c
-        {
-            x[0] * y[0],
-            x[1] * y[1]
-        };
-
-        return a.hadamard_mult(b) == c;
-    }
-
-    bool hadamard_div()
-    {
-        const ar2 x{1.0, 2.0};
-        const ar2 y{3.0, 5.0};
-
-        Vec2 a{x[0], x[1]};
-        Vec2 b{y[0], y[1]};
-        Vec2 c
-        {
-            x[0] / y[0],
-            x[1] / y[1]
-        };
-
-        return a.hadamard_div(b) == c;
-    }
-
-    bool scalar_mult()
-    {
-        const Vec2 a{1.0, 2.0};
-        const double scalar = 69.69;
-        const Vec2 b
-        {
-            a.x * scalar,
-            a.y * scalar
-        };
-        return a * scalar == b;
-    }
-
-    bool scalar_div()
-    {
-        const Vec2 a{1.0, 2.0};
-        const double scalar = 69.69;
-        const Vec2 b
-        {
-            a.x / scalar,
-            a.y / scalar
-        };
-        return a / scalar == b;
-    }
-} // namespace TestVec2
-
-namespace TestVec3 {
-    bool equal()
-    {
-        const ar3 x{1.0, 2.0, 3.0};
-        const ar3 y{5.0, 8.0, 13.0};
-
-        if (x != x)
-            return false;
-
-        if (x == y || y == x)
-            return false;
-
-        return x != y && y != x;
-    }
-
-    bool add()
-    {
-        const ar3 x{1.0, 2.0, 3.0};
-        const ar3 y{5.0, 8.0, 13.0};
-
-        Vec3 a{x[0], x[1], x[2]};
-        Vec3 b{y[0], y[1], y[2]};
-        Vec3 c
-        {
-            x[0] + y[0],
-            x[1] + y[1],
-            x[2] + y[2],
-        };
-
-        if (a + b != c)
-            return false;
-
-        a += b;
-        if (a != c)
-            return false;
-
-        return true;
-    }
-
-    bool sub()
-    {
-        const ar3 x{1.0, 2.0, 3.0};
-        const ar3 y{5.0, 8.0, 13.0};
-
-        Vec3 a{x[0], x[1], x[2]};
-        Vec3 b{y[0], y[1], y[2]};
-        Vec3 c
-        {
-            x[0] - y[0],
-            x[1] - y[1],
-            x[2] - y[2],
-        };
-
-        if (a - b != c)
-            return false;
-
-        a -= b;
-        if (a != c)
-            return false;
-
-        return true;
-    }
-
-    bool hadamard_mult()
-    {
-        const ar3 x{1.0, 2.0, 3.0};
-        const ar3 y{5.0, 8.0, 13.0};
-
-        Vec3 a{x[0], x[1], x[2]};
-        Vec3 b{y[0], y[1], y[2]};
-        Vec3 c
-        {
-            x[0] * y[0],
-            x[1] * y[1],
-            x[2] * y[2],
-        };
-
-        return a.hadamard_mult(b) == c;
-    }
-
-    bool hadamard_div()
-    {
-        const ar3 x{1.0, 2.0, 3.0};
-        const ar3 y{5.0, 8.0, 13.0};
-
-        Vec3 a{x[0], x[1], x[2]};
-        Vec3 b{y[0], y[1], y[2]};
-        Vec3 c
-        {
-            x[0] / y[0],
-            x[1] / y[1],
-            x[2] / y[2],
-        };
-
-        return a.hadamard_div(b) == c;
-    }
-
-    bool scalar_mult()
-    {
-        const Vec3 a{1.0, 2.0, 3.0};
-        const double scalar = 69.69;
-        const Vec3 b
-        {
-            a.x * scalar,
-            a.y * scalar,
-            a.z * scalar
-        };
-        return a * scalar == b;
-    }
-
-    bool scalar_div()
-    {
-        const Vec3 a{1.0, 2.0, 3.0};
-        const double scalar = 69.69;
-        const Vec3 b
-        {
-            a.x / scalar,
-            a.y / scalar,
-            a.z / scalar
-        };
-        return a / scalar == b;
-    }
-} // namespace TestVec3
-
-namespace TestVec4 {
-    bool equal()
-    {
-        const ar4 x{1.0, 2.0, 3.0, 5.0};
-        const ar4 y{8.0, 13.0, 21.0, 34.0};
-
-        if (x != x)
-            return false;
-
-        if (x == y || y == x)
-            return false;
-
-        return x != y && y != x;
-    }
-
-    bool add()
-    {
-        const ar4 x{1.0, 2.0, 3.0, 5.0};
-        const ar4 y{8.0, 13.0, 21.0, 34.0};
-
-        Vec4 a{x[0], x[1], x[2], x[3]};
-        Vec4 b{y[0], y[1], y[2], y[3]};
-        Vec4 c
-        {
-            x[0] + y[0],
-            x[1] + y[1],
-            x[2] + y[2],
-            x[3] + y[3]
-        };
-
-        if (a + b != c)
-            return false;
-
-        a += b;
-        if (a != c)
-            return false;
-
-        return true;
-    }
-
-    bool sub()
-    {
-        const ar4 x{1.0, 2.0, 3.0, 5.0};
-        const ar4 y{8.0, 13.0, 21.0, 34.0};
-
-        Vec4 a{x[0], x[1], x[2], x[3]};
-        Vec4 b{y[0], y[1], y[2], y[3]};
-        Vec4 c
-        {
-            x[0] - y[0],
-            x[1] - y[1],
-            x[2] - y[2],
-            x[3] - y[3]
-        };
-
-        if (a - b != c)
-            return false;
-
-        a -= b;
-        if (a != c)
-            return false;
-
-        return true;
-    }
-
-    bool hadamard_mult()
-    {
-        const ar4 x{1.0, 2.0, 3.0, 5.0};
-        const ar4 y{8.0, 13.0, 21.0, 34.0};
-
-        Vec4 a{x[0], x[1], x[2], x[3]};
-        Vec4 b{y[0], y[1], y[2], y[3]};
-        Vec4 c
-        {
-            x[0] * y[0],
-            x[1] * y[1],
-            x[2] * y[2],
-            x[3] * y[3]
-        };
-
-        return a.hadamard_mult(b) == c;
-    }
-
-    bool hadamard_div()
-    {
-        const ar4 x{1.0, 2.0, 3.0, 5.0};
-        const ar4 y{8.0, 13.0, 21.0, 34.0};
-
-        Vec4 a{x[0], x[1], x[2], x[3]};
-        Vec4 b{y[0], y[1], y[2], y[3]};
-        Vec4 c
-        {
-            x[0] / y[0],
-            x[1] / y[1],
-            x[2] / y[2],
-            x[3] / y[3]
-        };
-
-        return a.hadamard_div(b) == c;
-    }
-
-    bool scalar_mult()
-    {
-        const Vec4 a{1.0, 2.0, 3.0, 5.0};
-        const double scalar = 69.69;
-        const Vec4 b
-        {
-            a.x * scalar,
-            a.y * scalar,
-            a.z * scalar,
-            a.w * scalar
-        };
-        return a * scalar == b;
-    }
-
-    bool scalar_div()
-    {
-        const Vec4 a{1.0, 2.0, 3.0, 5.0};
-        const double scalar = 69.69;
-        const Vec4 b
-        {
-            a.x / scalar,
-            a.y / scalar,
-            a.z / scalar,
-            a.w / scalar
-        };
-        return a / scalar == b;
-    }
-} // namespace TestVec4
-
-int run_test_linear_algebra()
-{
+template <size_t N>
+std::array<unsigned int, 2> test_vector() {
     std::vector<TestCase> tests = {
-        {"Vec2::equal", TestVec2::equal},
-        {"Vec3::equal", TestVec3::equal},
-        {"Vec4::equal", TestVec4::equal},
-        {"Vec2::add", TestVec2::add},
-        {"Vec3::add", TestVec3::add},
-        {"Vec4::add", TestVec4::add},
-        {"Vec2::sub", TestVec2::sub},
-        {"Vec3::sub", TestVec3::sub},
-        {"Vec4::sub", TestVec4::sub},
-        {"Vec2::hadamard_mult", TestVec2::hadamard_mult},
-        {"Vec3::hadamard_mult", TestVec3::hadamard_mult},
-        {"Vec4::hadamard_mult", TestVec4::hadamard_mult},
-        {"Vec2::hadamard_div", TestVec2::hadamard_div},
-        {"Vec3::hadamard_div", TestVec3::hadamard_div},
-        {"Vec4::hadamard_div", TestVec4::hadamard_div},
-        {"Vec2::scalar_mult", TestVec2::scalar_mult},
-        {"Vec3::scalar_mult", TestVec3::scalar_mult},
-        {"Vec4::scalar_mult", TestVec4::scalar_mult},
-        {"Vec2::scalar_div", TestVec2::scalar_div},
-        {"Vec3::scalar_div", TestVec3::scalar_div},
-        {"Vec4::scalar_div", TestVec4::scalar_div}
+        { "default constructor"     , test_default_ctor<N>   },
+        { "array constructor"       , test_arr_ctor<N>       },
+        { "bracket accessor"        , test_bracket<N>        },
+        { "xyzw accessor"           , test_accessor<N>       },
+        { "equality"                , test_equality<N>       },
+        { "inequality"              , test_inequality<N>     },
+        { "addition"                , test_addition<N>       },
+        { "subtraction"             , test_subtraction<N>    },
+        { "multiplication"          , test_scalar_mult<N>    },
+        { "division"                , test_scalar_div<N>     },
+        { "component mult"          , test_component_mult<N> },
+        { "component div"           , test_component_div<N>  },
+        { "dot product"             , test_dot<N>            },
+        { "distance"                , test_distance<N>       },
+        { "linear interpolation"    , test_lerp<N>           }
     };
 
-    int num_tests_failed {0};
-
-    for (const auto& t : tests)
-    {
-        if (!t.test())
-        {
-            std::string mesg = std::format("{} failed", t.name);
-            log(mesg, ERROR, __FILE__, __LINE__);
-            ++num_tests_failed;
-        }
-        else
-        {
-            std::string mesg = std::format("{} passed", t.name);
-            log(mesg, SUCCESS);
+    unsigned int tests_failed{0};
+    for (const auto& test : tests) {
+        if (!test.run()) {
+            ++tests_failed;
+            std::string message = std::format("TEST FAILED: {}", test.description);
+            log(message, FAIL);
         }
     }
-
-    if (num_tests_failed > 0)
-    {
-        std::string mesg = std::format("run_test_linear_algebra: {} tests failed", num_tests_failed);
-        log(mesg, ERROR, __FILE__, __LINE__);
-    }
-
-    return num_tests_failed;
+    return {static_cast<unsigned int>(tests.size()), tests_failed};
 }
+
+// explicit instantiation (for testing)
+template std::array<unsigned int, 2> test_vector<2>();
+template std::array<unsigned int, 2> test_vector<3>();
+template std::array<unsigned int, 2> test_vector<4>();
