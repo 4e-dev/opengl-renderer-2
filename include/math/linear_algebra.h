@@ -14,15 +14,6 @@
 #define STATIC_INLINE static inline
 #endif
 
-// TODO: create test cases for the mult/div scalar functions...
-
-// FIXME: The multiplication and divison operations are HADAMARD ops.
-//  Not technically correct for the use case. Replace so that
-//  operation* and operation/, and other respective overloads, so that
-//  they represent vector (x) scalar.
-
-// Just rename the current overloaded operations as *hadamard-mult* and *hadamard-div*
-
 /*
    Version 1.0 targets to implement.
 
@@ -30,10 +21,10 @@
     Vec3 ─┼─ arithmetic (add, subtract, multiply, divide) [x]
     Vec4 ─┘
         ├─ dot
-        ├─ cross (Vec3)
         ├─ length / normalize
         ├─ distance
-        └─ lerp
+        ├─ lerp
+        ├─ cross (Vec3)
 
     Mat3 ─┐
     Mat4 ─┼─ arithmetic
@@ -57,363 +48,158 @@
         └── transform_point/vector
         */
 
-struct Vec2
-{
-    double x, y;
+#include <array>
+#include <cmath>
 
-    Vec2() : x(0.0), y(0.0) {}
-    Vec2(const double _x, const double _y) : x(_x), y(_y) {}
+template <size_t N>
+requires (N >= 1)
+class Vec {
+private:
+    std::array<double, N> v{};
 
-    // equality
-    bool operator==(const Vec2& V) const
-    {
-        return x == V.x
-            && y == V.y;
-    }
+public:
+    Vec() = default;
 
-    bool operator!=(const Vec2& V) const
-    {
-        return x != V.x
-            || y != V.y;
-    }
+    Vec(const std::array<double, N> values)
+        : v(values) {}
 
-    // addition
-    Vec2 operator+(const Vec2& V) const
-    {
-        return Vec2
-        {
-            x + V.x,
-            y + V.y
-        };
+    double operator[](const size_t i) const {
+        return v[i];
     }
 
-    void operator+=(const Vec2& V)
-    {
-        x += V.x;
-        y += V.y;
+    double& operator[](const size_t i) {
+        return v[i];
     }
 
-    // subtraction
-    Vec2 operator-(const Vec2& V) const
-    {
-        return Vec2
-        {
-            x - V.x,
-            y - V.y
-        };
-    }
+    double x() const { return v[0]; }
+    double y() const requires (N >= 2) { return v[1]; }
+    double z() const requires (N >= 3) { return v[2]; }
+    double w() const requires (N >= 4) { return v[3]; }
 
-    void operator-=(const Vec2& V)
-    {
-        x -= V.x;
-        y -= V.y;
-    }
+    static constexpr size_t dim = N;
+};
 
-    // multiplication
-    Vec2 operator*(const double scalar) const
-    {
-        return Vec2
-        {
-            x * scalar,
-            y * scalar
-        };
-    }
+template <size_t N>
+bool operator==(const Vec<N>& lhs, const Vec<N>& rhs) {
+    for (size_t i{0}; i < N; ++i)
+        if (lhs[i] != rhs[i])
+            return false;
+    return true;
+}
 
-    void operator*=(const double scalar)
-    {
-        x *= scalar;
-        y *= scalar;
-    }
+template <size_t N>
+bool operator!=(const Vec<N>& lhs, const Vec<N>& rhs) {
+    return !(lhs == rhs);
+}
 
-    Vec2 hadamard_mult(const Vec2& V)
-    {
-        return Vec2
-        {
-            x * V.x,
-            y * V.y
-        };
-    }
+template <size_t N>
+Vec<N> operator+(const Vec<N>& lhs, const Vec<N>& rhs) {
+    std::array<double, N> a{};
+    for (size_t i{0}; i < N; ++i)
+        a[i] = lhs[i] + rhs[i];
+    return Vec<N>(a);
+}
 
-    // division
-    Vec2 operator/(const double scalar) const
-    {
-        return Vec2
-        {
-            x / scalar,
-            y / scalar,
-        };
-    }
+template <size_t N>
+void operator+=(Vec<N>& lhs, const Vec<N>& rhs) {
+    for (size_t i{0}; i < N; ++i)
+        lhs[i] += rhs[i];
+}
 
-    void operator/=(const double scalar)
-    {
-        x /= scalar;
-        y /= scalar;
-    }
+template <size_t N>
+Vec<N> operator-(const Vec<N>& lhs, const Vec<N>& rhs) {
+    std::array<double, N> a{};
+    for (size_t i{0}; i < N; ++i)
+        a[i] = lhs[i] - rhs[i];
+    return Vec<N>(a);
+}
 
-    Vec2 hadamard_div(const Vec2& V)
-    {
-        return Vec2
-        {
-            x / V.x,
-            y / V.y
-        };
-    }
-}; // struct Vec2
+template <size_t N>
+void operator-=(Vec<N>& lhs, Vec<N>& rhs) {
+    for (size_t i{0}; i < N; ++i)
+        lhs[i] -= rhs[i];
+}
 
-struct Vec3
-{
-    double x, y, z;
+template <size_t N>
+Vec<N> operator*(const Vec<N>& v, const double scalar) {
+    std::array<double, N> a{};
+    for (size_t i{0}; i < N; ++i) {
+        a[i] = v[i] * scalar;
+    }
+    return Vec<N>(a);
+}
 
-    Vec3()
-    {
-        x = 0.0;
-        y = 0.0;
-        z = 0.0;
-    }
+template <size_t N>
+Vec<N> operator*(const double scalar, const Vec<N>& v) {
+    return v * scalar;
+}
 
-    Vec3(const double x, const double y, const double z)
-    {
-        this->x = x;
-        this->y = y;
-        this->z = z;
-    }
+template<size_t N>
+Vec<N> operator*=(Vec<N>& v, const double scalar) {
+    for (size_t i{0}; i < N; ++i)
+        v[i] *= scalar;
+}
 
-    // equality
-    bool operator==(const Vec3& V) const
-    {
-        return x == V.x
-            && y == V.y
-            && z == V.z;
+template<size_t N>
+Vec<N> operator/(const Vec<N>& v, const double scalar) {
+    std::array<double, N> a{};
+    for (size_t i{0}; i < N; ++i) {
+        a[i] = v[i] / scalar;
     }
+    return Vec<N>(a);
+}
 
-    bool operator!=(const Vec3& V) const
-    {
-        return x != V.x
-            || y != V.y
-            || z != V.z;
-    }
+template<size_t N>
+Vec<N> component_multiply(const Vec<N>& lhs, const Vec<N>& rhs) {
+    std::array<double, N> a{};
+    for (size_t i{0}; i < N; ++i)
+        a[i] = lhs[i] * rhs[i];
+    return Vec<N>(a);
+}
 
-    // addition
-    Vec3 operator+(const Vec3& V) const
-    {
-        return Vec3
-        {
-            x + V.x,
-            y + V.y,
-            z + V.z
-        };
-    }
-    void operator+=(const Vec3& V)
-    {
-        x += V.x;
-        y += V.y;
-        z += V.z;
-    }
+template<size_t N>
+Vec<N> component_divide(const Vec<N>& lhs, const Vec<N>& rhs) {
+    std::array<double, N> a{};
+    for (size_t i{0}; i < N; ++i)
+        a[i] = lhs[i] / rhs[i];
+    return Vec<N>(a);
+}
 
-    // subtraction
-    Vec3 operator-(const Vec3& V) const
-    {
-        return Vec3
-        {
-            x - V.x,
-            y - V.y,
-            z - V.z
-        };
-    }
-    void operator-=(const Vec3& V)
-    {
-        x -= V.x;
-        y -= V.y;
-        z -= V.z;
-    }
+template <typename VecType>
+STATIC_INLINE double dot(const VecType& lhs, const VecType& rhs) {
+    double result {0.0};
+    for (size_t i{0}; i < VecType::dim; ++i)
+        result += (lhs[i] * rhs[i]);
+    return result;
+}
 
-    // multiplication
-    Vec3 operator*(const double scalar) const
-    {
-        return Vec3
-        {
-            x * scalar,
-            y * scalar,
-            z * scalar
-        };
+template <typename VecType>
+STATIC_INLINE double distance(const VecType& u, const VecType& v) {
+    double d{0.0};
+    for (size_t i{0}; i < VecType::dim; ++i) {
+        d += pow((u[i] - v[i]), 2);
     }
+    d = sqrt(d);
+    return d;
+}
 
-    void operator*=(const double scalar)
-    {
-        x *= scalar;
-        y *= scalar;
-        z *= scalar;
-    }
+STATIC_INLINE double lerp(
+    const double start,
+    const double end,
+    const double factor) {
+    return start + (end - start) * factor;
+}
 
-    Vec3 hadamard_mult(const Vec3& V)
-    {
-        return Vec3
-        {
-            x * V.x,
-            y * V.y,
-            z * V.z
-        };
-    }
+template <typename VecType>
+STATIC_INLINE VecType lerp(
+    const VecType& start,
+    const VecType& end,
+    const double factor) {
+    const size_t N {VecType::dim};
 
-    // division
-    Vec3 operator/(const double scalar) const
-    {
-        return Vec3
-        {
-            x / scalar,
-            y / scalar,
-            z / scalar
-        };
+    std::array<double, N> a{};
+    for (size_t i{0}; i < N; ++i) {
+        a[i] = lerp(start[i], end[i], factor);
     }
-
-    void operator/=(const double scalar)
-    {
-        x /= scalar;
-        y /= scalar;
-        z /= scalar;
-    }
-
-    Vec3 hadamard_div(const Vec3& V)
-    {
-        return Vec3
-        {
-            x / V.x,
-            y / V.y,
-            z / V.z
-        };
-    }
-}; // struct Vec3
-
-struct Vec4
-{
-    double x, y, z, w;
-    Vec4()
-    {
-        x = 0.0;
-        y = 0.0;
-        z = 0.0;
-        w = 0.0;
-    }
-    Vec4(const double x, const double y, const double z, const double w)
-    {
-        this->x = x;
-        this->y = y;
-        this->z = z;
-        this->w = w;
-    }
-
-    // equality
-    bool operator==(const Vec4& V) const
-    {
-        return x == V.x
-            && y == V.y
-            && z == V.z
-            && w == V.w;
-    }
-    bool operator!=(const Vec4& V) const
-    {
-        return x != V.x
-            || y != V.y
-            || z != V.z
-            || w != V.w;
-    }
-
-    // addition
-    Vec4 operator+(const Vec4& V) const
-    {
-        return Vec4
-        {
-            x + V.x,
-            y + V.y,
-            z + V.z,
-            w + V.w
-        };
-    }
-    void operator+=(const Vec4& V)
-    {
-        x += V.x;
-        y += V.y;
-        z += V.z;
-        w += V.w;
-    }
-
-    // subtraction
-    Vec4 operator-(const Vec4& V) const
-    {
-        return Vec4
-        {
-            x - V.x,
-            y - V.y,
-            z - V.z,
-            w - V.w,
-        };
-    }
-    void operator-=(const Vec4& V)
-    {
-        x -= V.x;
-        y -= V.y;
-        z -= V.z;
-        w -= V.w;
-    }
-
-    // multiplication
-    Vec4 operator*(const double scalar) const
-    {
-        return Vec4
-        {
-            x * scalar,
-            y * scalar,
-            z * scalar,
-            w * scalar
-        };
-    }
-
-    void operator*=(const double scalar)
-    {
-        x *= scalar;
-        y *= scalar;
-        z *= scalar;
-        w *= scalar;
-    }
-    Vec4 hadamard_mult(const Vec4& V)
-    {
-        return Vec4
-        {
-            x * V.x,
-            y * V.y,
-            z * V.z,
-            w * V.w
-        };
-    }
-
-    // division
-    Vec4 operator/(const double scalar) const
-    {
-        return Vec4
-        {
-            x / scalar,
-            y / scalar,
-            z / scalar,
-            w / scalar
-        };
-    }
-
-    void operator/=(const double scalar)
-    {
-        x /= scalar;
-        y /= scalar;
-        z /= scalar;
-        w /= scalar;
-    }
-
-    Vec4 hadamard_div(const Vec4& V)
-    {
-        return Vec4
-        {
-            x / V.x,
-            y / V.y,
-            z / V.z,
-            w / V.w
-        };
-    }
-}; // struct Vec4
+    return VecType(a);
+}
