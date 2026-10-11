@@ -14,15 +14,52 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 }
 
 int main() {
-    // [GLFW / windowing]
-    if (!glfwInit()) {
-        log("FAILED::GLFW initialization.", ERROR);
+    if (!glfwInit())
+    {
+        log("FAILED::GLFW initialization.", ERROR, __FILE__, __LINE__);
         glfwTerminate();
-        return 1;
+        return EXIT_FAILURE;
     }
 
+    // using opengl v4.6 - core
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+    GLFWwindow* window = glfwCreateWindow(1920, 1080, "Retail Sim", nullptr, nullptr);
+    if (!window)
+    {
+        log("FAILED::GLFW window creation.", ERROR, __FILE__, __LINE__);
+        glfwDestroyWindow(window);
+        glfwTerminate();
+        return EXIT_FAILURE;
+    }
+
+    glfwSetKeyCallback(window, key_callback);
+    glfwMakeContextCurrent(window);
+
+    if (!gladLoadGL())
+    {
+        log("FAILED::GLAD initialization.", ERROR, __FILE__, __LINE__);
+        glfwDestroyWindow(window);
+        glfwTerminate();
+        return EXIT_FAILURE;
+    }
+
+
+    //TODO: currently going through the glfw tutorial text
+    GLuint vertex_buffer;
+
+    // gameplay loop
+    while (!glfwWindowShouldClose(window))
+    {
+        // TODO: run something...
+    }
+
+    // cleanup
+    glfwDestroyWindow(window);
     glfwTerminate();
-    return 0;
+    return EXIT_SUCCESS;
 }
 
 // TODO: refine this function; the switch statement should only change the final color (DRY)
