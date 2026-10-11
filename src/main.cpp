@@ -1,12 +1,10 @@
+// third party
 #include <glad/glad.h>
 #include <glfw/glfw3.h>
-#include <print>
-#include <string>
 
-enum LOG_TYPE {
-    ERROR,
-    WARN,
-};
+// custom
+#include <math/linear_algebra.h>
+#include <util/log.h>
 
 void log(std::string_view message, const LOG_TYPE log_type);
 
