@@ -20,12 +20,13 @@
     Vec2 ─┐
     Vec3 ─┼─ arithmetic (add, subtract, multiply, divide) [x]
     Vec4 ─┘
-        ├─ dot
-        ├─ length / normalize
-        ├─ distance
-        ├─ lerp
-        ├─ cross (Vec3)
+        ├─ dot [x]
+        ├─ length / normalize [x]
+        ├─ distance [x]
+        ├─ lerp [x]
 
+
+    (cross (Vec3), whwich is basically a 3x1 matrix)
     Mat3 ─┐
     Mat4 ─┼─ arithmetic
         ├─ matrix multiplication
@@ -46,7 +47,7 @@
         ├── clamp
         ├── lerp
         └── transform_point/vector
-        */
+*/
 
 #include <array>
 #include <cmath>
