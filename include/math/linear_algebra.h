@@ -72,6 +72,12 @@ public:
         return v[i];
     }
 
+    auto begin() { return v.begin(); }
+    auto begin() const { return v.begin(); }
+
+    auto end() { return v.end(); }
+    auto end() const { return v.end(); }
+
     double x() const { return v[0]; }
     double y() const requires (N >= 2) { return v[1]; }
     double z() const requires (N >= 3) { return v[2]; }
