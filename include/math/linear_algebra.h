@@ -87,6 +87,23 @@ public:
 };
 
 template <size_t N>
+std::ostream& operator<<(std::ostream& os, const Vec<N>& v) {
+    // always show some decimal points
+    os << std::fixed << std::setprecision(2);
+    os << "Vec<" << N << ">{ ";
+    size_t i{0};
+    for (const double val : v) {
+        if (i > 0) {
+            os << ", ";
+        }
+        os << val;
+        ++i;
+    }
+    os << " }";
+    return os;
+}
+
+template <size_t N>
 bool operator==(const Vec<N>& lhs, const Vec<N>& rhs) {
     for (size_t i{0}; i < N; ++i)
         if (lhs[i] != rhs[i])
