@@ -231,3 +231,12 @@ STATIC_INLINE VecType lerp(const VecType& start, const VecType& end, const doubl
     }
     return VecType(a);
 }
+
+// --------------------------------------------
+// TODO: working on matrix and matrix operators
+// --------------------------------------------
+
+template <size_t N, size_t M>
+class Mat {
+    std::array<std::array<double, N>, M> m{};
+};
