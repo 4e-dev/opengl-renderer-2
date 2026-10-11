@@ -51,6 +51,9 @@
 
 #include <array>
 #include <cmath>
+#include <iomanip>
+#include <iostream>
+#include <ranges>
 
 template <size_t N>
 requires (N >= 1)
