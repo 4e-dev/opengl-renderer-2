@@ -6,7 +6,12 @@
 #include <math/linear_algebra.h>
 #include <util/log.h>
 
-void log(std::string_view message, const LOG_TYPE log_type);
+static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+    /* Handles key and mouse input for GLFW */
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+        glfwSetWindowShouldClose(window, GLFW_TRUE);
+    }
+}
 
 int main() {
     // [GLFW / windowing]
