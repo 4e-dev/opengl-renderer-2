@@ -105,9 +105,11 @@ std::ostream& operator<<(std::ostream& os, const Vec<N>& v) {
 
 template <size_t N>
 bool operator==(const Vec<N>& lhs, const Vec<N>& rhs) {
-    for (size_t i{0}; i < N; ++i)
-        if (lhs[i] != rhs[i])
+    for (auto i : std::views::iota(0uz, N)) {
+        if (lhs[i] != rhs[i]) {
             return false;
+        }
+    }
     return true;
 }
 
@@ -119,35 +121,39 @@ bool operator!=(const Vec<N>& lhs, const Vec<N>& rhs) {
 template <size_t N>
 Vec<N> operator+(const Vec<N>& lhs, const Vec<N>& rhs) {
     std::array<double, N> a{};
-    for (size_t i{0}; i < N; ++i)
+    for (auto i : std::views::iota(0uz, N)) {
         a[i] = lhs[i] + rhs[i];
+    }
     return Vec<N>(a);
 }
 
 template <size_t N>
 void operator+=(Vec<N>& lhs, const Vec<N>& rhs) {
-    for (size_t i{0}; i < N; ++i)
+    for (auto i : std::views::iota(0uz, N)) {
         lhs[i] += rhs[i];
+    }
 }
 
 template <size_t N>
 Vec<N> operator-(const Vec<N>& lhs, const Vec<N>& rhs) {
     std::array<double, N> a{};
-    for (size_t i{0}; i < N; ++i)
+    for (auto i : std::views::iota(0uz, N)) {
         a[i] = lhs[i] - rhs[i];
+    }
     return Vec<N>(a);
 }
 
 template <size_t N>
 void operator-=(Vec<N>& lhs, Vec<N>& rhs) {
-    for (size_t i{0}; i < N; ++i)
+    for (auto i : std::views::iota(0uz, N)) {
         lhs[i] -= rhs[i];
+    }
 }
 
 template <size_t N>
 Vec<N> operator*(const Vec<N>& v, const double scalar) {
     std::array<double, N> a{};
-    for (size_t i{0}; i < N; ++i) {
+    for (auto i : std::views::iota(0uz, N)) {
         a[i] = v[i] * scalar;
     }
     return Vec<N>(a);
@@ -160,14 +166,15 @@ Vec<N> operator*(const double scalar, const Vec<N>& v) {
 
 template<size_t N>
 Vec<N> operator*=(Vec<N>& v, const double scalar) {
-    for (size_t i{0}; i < N; ++i)
+    for (auto i : std::views::iota(0uz, N)) {
         v[i] *= scalar;
+    }
 }
 
 template<size_t N>
 Vec<N> operator/(const Vec<N>& v, const double scalar) {
     std::array<double, N> a{};
-    for (size_t i{0}; i < N; ++i) {
+    for (auto i : std::views::iota(0uz, N)) {
         a[i] = v[i] / scalar;
     }
     return Vec<N>(a);
@@ -176,31 +183,34 @@ Vec<N> operator/(const Vec<N>& v, const double scalar) {
 template<size_t N>
 Vec<N> component_multiply(const Vec<N>& lhs, const Vec<N>& rhs) {
     std::array<double, N> a{};
-    for (size_t i{0}; i < N; ++i)
+    for (auto i : std::views::iota(0uz, N)) {
         a[i] = lhs[i] * rhs[i];
+    }
     return Vec<N>(a);
 }
 
 template<size_t N>
 Vec<N> component_divide(const Vec<N>& lhs, const Vec<N>& rhs) {
     std::array<double, N> a{};
-    for (size_t i{0}; i < N; ++i)
+    for (auto i : std::views::iota(0uz, N)) {
         a[i] = lhs[i] / rhs[i];
+    }
     return Vec<N>(a);
 }
 
 template <typename VecType>
 STATIC_INLINE double dot(const VecType& lhs, const VecType& rhs) {
     double result {0.0};
-    for (size_t i{0}; i < VecType::dim; ++i)
+    for (auto i : std::views::iota(0uz, VecType::dim)) {
         result += (lhs[i] * rhs[i]);
+    }
     return result;
 }
 
 template <typename VecType>
 STATIC_INLINE double distance(const VecType& u, const VecType& v) {
     double d{0.0};
-    for (size_t i{0}; i < VecType::dim; ++i) {
+    for (auto i : std::views::iota(0uz, VecType::dim)) {
         d += pow((u[i] - v[i]), 2);
     }
     d = sqrt(d);
@@ -222,7 +232,7 @@ STATIC_INLINE VecType lerp(
     const size_t N {VecType::dim};
 
     std::array<double, N> a{};
-    for (size_t i{0}; i < N; ++i) {
+    for (auto i : std::views::iota(0uz, N)) {
         a[i] = lerp(start[i], end[i], factor);
     }
     return VecType(a);
