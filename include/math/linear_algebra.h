@@ -61,8 +61,7 @@ private:
 public:
     Vec() = default;
 
-    Vec(const std::array<double, N> values)
-        : v(values) {}
+    Vec(const std::array<double, N> values) : v(values) {}
 
     double operator[](const size_t i) const {
         return v[i];
@@ -213,24 +212,16 @@ STATIC_INLINE double distance(const VecType& u, const VecType& v) {
     for (auto i : std::views::iota(0uz, VecType::dim)) {
         d += pow((u[i] - v[i]), 2);
     }
-    d = sqrt(d);
-    return d;
+    return sqrt(d);
 }
 
-STATIC_INLINE double lerp(
-    const double start,
-    const double end,
-    const double factor) {
+STATIC_INLINE double lerp(const double start, const double end, const double factor) {
     return start + (end - start) * factor;
 }
 
 template <typename VecType>
-STATIC_INLINE VecType lerp(
-    const VecType& start,
-    const VecType& end,
-    const double factor) {
+STATIC_INLINE VecType lerp(const VecType& start, const VecType& end, const double factor) {
     const size_t N {VecType::dim};
-
     std::array<double, N> a{};
     for (auto i : std::views::iota(0uz, N)) {
         a[i] = lerp(start[i], end[i], factor);
