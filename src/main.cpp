@@ -1,3 +1,6 @@
+// standard
+#include <array>
+
 // third party
 #include <glad/glad.h>
 #include <glfw/glfw3.h>
@@ -14,8 +17,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 }
 
 int main() {
-    if (!glfwInit())
-    {
+    if (!glfwInit()) {
         log("FAILED::GLFW initialization.", ERROR, __FILE__, __LINE__);
         glfwTerminate();
         return EXIT_FAILURE;
