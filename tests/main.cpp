@@ -7,7 +7,7 @@
 using Test = std::array<unsigned, 2>(*)(); // pointer to a function
 
 unsigned run_test(Test test, std::string_view message) {
-    std::println("CURRENT TEST : {}", message);
+    std::println("TESTING : {}", message);
 
     std::array<unsigned, 2> result { test() };
     unsigned tests { result[0] };
@@ -22,11 +22,14 @@ unsigned run_test(Test test, std::string_view message) {
 }
 
 int main() {
-    unsigned fail {0};
+    unsigned int fail {0};
 
+    // add tests here...
     fail += run_test(test_vector<2>, "test_vector<2>");
     fail += run_test(test_vector<3>, "test_vector<3>");
     fail += run_test(test_vector<4>, "test_vector<4>");
+    fail += run_test(test_matrix<3, 3>, "test_matrix<3, 3>");
+    fail += run_test(test_matrix<4, 4>, "test_matrix<3, 3>");
 
     if (fail == 0) {
         std::string mesg = "All tests passed!";
