@@ -1,6 +1,4 @@
-#include "math/linear_algebra.h"
 #include "tests/test_linear_algebra.h"
-#include "util/log.h"
 
 using Test = bool(*)();
 struct TestCase {
@@ -15,6 +13,7 @@ std::uniform_real_distribution<double> distrib(1.0, 100.0);
 
 // -----------------------------
 
+namespace TVec {
 template <size_t N>
 bool test_default_ctor() {
     Vec<N> v{};
@@ -213,25 +212,30 @@ bool test_lerp() {
     }
     return true;
 }
+}; // TVec
 
 template <size_t N>
 std::array<unsigned int, 2> test_vector() {
+    /*
+       returns the number tests and the number of tests *failed*
+    */
+
     std::vector<TestCase> tests = {
-        { "default constructor"     , test_default_ctor<N>   },
-        { "array constructor"       , test_arr_ctor<N>       },
-        { "bracket accessor"        , test_bracket<N>        },
-        { "xyzw accessor"           , test_accessor<N>       },
-        { "equality"                , test_equality<N>       },
-        { "inequality"              , test_inequality<N>     },
-        { "addition"                , test_addition<N>       },
-        { "subtraction"             , test_subtraction<N>    },
-        { "multiplication"          , test_scalar_mult<N>    },
-        { "division"                , test_scalar_div<N>     },
-        { "component mult"          , test_component_mult<N> },
-        { "component div"           , test_component_div<N>  },
-        { "dot product"             , test_dot<N>            },
-        { "distance"                , test_distance<N>       },
-        { "linear interpolation"    , test_lerp<N>           }
+        { "default constructor"     , TVec::test_default_ctor<N>   },
+        { "array constructor"       , TVec::test_arr_ctor<N>       },
+        { "bracket accessor"        , TVec::test_bracket<N>        },
+        { "xyzw accessor"           , TVec::test_accessor<N>       },
+        { "equality"                , TVec::test_equality<N>       },
+        { "inequality"              , TVec::test_inequality<N>     },
+        { "addition"                , TVec::test_addition<N>       },
+        { "subtraction"             , TVec::test_subtraction<N>    },
+        { "multiplication"          , TVec::test_scalar_mult<N>    },
+        { "division"                , TVec::test_scalar_div<N>     },
+        { "component mult"          , TVec::test_component_mult<N> },
+        { "component div"           , TVec::test_component_div<N>  },
+        { "dot product"             , TVec::test_dot<N>            },
+        { "distance"                , TVec::test_distance<N>       },
+        { "linear interpolation"    , TVec::test_lerp<N>           }
     };
 
     unsigned int tests_failed{0};
@@ -249,3 +253,83 @@ std::array<unsigned int, 2> test_vector() {
 template std::array<unsigned int, 2> test_vector<2>();
 template std::array<unsigned int, 2> test_vector<3>();
 template std::array<unsigned int, 2> test_vector<4>();
+
+namespace TMat {
+    template<size_t Rows, size_t Cols>
+    bool test_default_ctor() {
+        Mat<Rows, Cols> mat{};
+        for (auto i : std::views::iota(0uz, Rows)) {
+            for (auto j : std::views::iota(0uz, Cols)) {
+                if (mat[i][j] != 0.0) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    template<size_t Rows, size_t Cols>
+    bool test_init_list_ctor() {
+        std::vector<std::vector<double>> initializer{};
+        initializer.reserve(Rows);
+
+        // generate random values for initializer
+        for (auto _ : std::views::iota(0uz, Rows)) {
+            std::vector<double> line{};
+            line.reserve(Cols);
+            for (auto _ : std::views::iota(0uz, Cols)) {
+                line.emplace_back(distrib(gen));
+            }
+            initializer.emplace_back(line);
+        }
+
+        // construct
+        Mat<Rows, Cols> mat{initializer};
+
+        // compare init list with matrix
+        for (auto i : std::views::iota(0uz, Rows)) {
+            for (auto j : std::views::iota(0uz, Cols)) {
+                if (mat[i][j] != initializer[i][j]) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    //bool test_bracket
+    //bool test_accessor
+    //bool test_equality
+    //bool test_inequality
+    //bool test_addition
+    //bool test_subtraction
+    //bool test_scalar_mult
+    //bool test_scalar_div
+    //bool test_component_mult
+    //bool test_component_div
+    //bool test_dot
+    //bool test_distance
+    //bool test_lerp
+}; // TMat
+
+template <size_t Rows, size_t Cols>
+std::array<unsigned int, 2> test_matrix() {
+    std::vector<TestCase> tests = {
+        {"default constructor", TMat::test_default_ctor<Rows, Cols>},
+        {"initializer list constructor", TMat::test_init_list_ctor<Rows, Cols>}
+    };
+
+    unsigned int tests_failed{0};
+    for (const auto& test : tests) {
+        if (!test.run()) {
+            ++tests_failed;
+            std::string message = std::format("TEST FAILED: {}", test.description);
+            log(message, FAIL);
+        }
+    }
+    return {static_cast<unsigned int>(tests.size()), tests_failed};
+}
+
+// explicit instantiation (for testing)
+template std::array<unsigned int, 2> test_matrix<3, 3>();
+template std::array<unsigned int, 2> test_matrix<4, 4>();
