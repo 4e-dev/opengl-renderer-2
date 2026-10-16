@@ -1,13 +1,8 @@
-/*
-   Header-only, custom linear algebra library
-   */
-
 #pragma once
 
 /* NOTE: removing inline can be useful for debugging compiler behavior / benchmarking
    or just letting the compiler do its thang.
    */
-
 #ifdef DO_NOT_DECLARE_INLINE
 #define STATIC_INLINE static
 #else
@@ -51,42 +46,44 @@
 
 #include <array>
 #include <cmath>
+#include <exception>
 #include <iomanip>
 #include <iostream>
 #include <ranges>
+#include <string>
+#include <vector>
 
 template <size_t N>
 requires (N >= 1)
 class Vec {
-private:
-    std::array<double, N> v{};
+    private:
+        std::array<double, N> v{};
 
-public:
-    Vec() = default;
+    public:
+        Vec() = default;
 
-    Vec(const std::array<double, N> values) : v(values) {}
+        Vec(const std::array<double, N> values) : v(values) {}
 
-    double operator[](const size_t i) const {
-        return v[i];
-    }
+        double operator[](const size_t i) const { return v[i]; }
+        double& operator[](const size_t i) { return v[i]; }
 
-    double& operator[](const size_t i) {
-        return v[i];
-    }
+        // TODO: test these
+        Vec& operator=(const Vec& other) { v = other; }
+        Vec operator=(const Vec other) const { v = other; }
 
-    auto begin() { return v.begin(); }
-    auto begin() const { return v.begin(); }
+        auto begin() { return v.begin(); }
+        auto begin() const { return v.begin(); }
 
-    auto end() { return v.end(); }
-    auto end() const { return v.end(); }
+        auto end() { return v.end(); }
+        auto end() const { return v.end(); }
 
-    double x() const { return v[0]; }
-    double y() const requires (N >= 2) { return v[1]; }
-    double z() const requires (N >= 3) { return v[2]; }
-    double w() const requires (N >= 4) { return v[3]; }
+        double x() const { return v[0]; }
+        double y() const requires (N >= 2) { return v[1]; }
+        double z() const requires (N >= 3) { return v[2]; }
+        double w() const requires (N >= 4) { return v[3]; }
 
-    static constexpr size_t dim = N;
-};
+        static constexpr size_t dim = N;
+}; // Vec
 
 template <size_t N>
 std::ostream& operator<<(std::ostream& os, const Vec<N>& v) {
@@ -236,7 +233,62 @@ STATIC_INLINE VecType lerp(const VecType& start, const VecType& end, const doubl
 // TODO: working on matrix and matrix operators
 // --------------------------------------------
 
-template <size_t N, size_t M>
+template <size_t Rows, size_t Cols>
+requires (Rows >= 1 && Cols >= 1)
 class Mat {
-    std::array<std::array<double, N>, M> m{};
-};
+    private:
+        //std::array<std::array<double, Cols>, Rows> data;
+        std::vector<std::vector<double>> data;
+
+    public:
+        Mat() {
+            data.resize(Rows, std::vector<double>(Cols, 0.0));
+        }
+
+        Mat(const std::vector<std::vector<double>>& values) {
+            size_t rows = values.size();
+            size_t cols = values[0].size();
+
+            if (rows != Rows || cols != Cols) {
+                std::string message{};
+                message += "\nInitializer list is of incorrect size!\n";
+                message += std::format("Expected <{}, {}>\n", Rows, Cols);
+                message += std::format("Given <{}, {}>\n", rows, cols);
+                throw std::invalid_argument(message);
+            }
+            data = values;
+        }
+
+        auto& operator[](const size_t i) { return data[i]; }
+        const auto& operator[](const size_t i) const { return data[i]; }
+
+        static constexpr size_t nrows = Rows;
+        static constexpr size_t ncols = Cols;
+}; // Mat
+
+template <size_t Rows, size_t Cols>
+std::ostream& operator<<(std::ostream& os, const Mat<Rows, Cols>& matrix) {
+    // always show some decimal points
+    os << std::fixed << std::setprecision(2);
+
+    os << "Mat<" << Rows << ", " << Cols << "> = \n";
+
+    for (auto i : std::views::iota(0uz, Rows)) {
+        std::pair<std::string, std::string> brackets{};
+
+        if (i == 0)
+            brackets = {"⎡", "⎤"};
+        else if (i == Rows-1)
+            brackets = {"⎣", "⎦"};
+        else
+            brackets = {"⎢", "⎢"};
+
+        os << brackets.first << " ";
+        for (auto j : std::views::iota(0uz, Cols)) {
+            os << matrix[i][j] << " ";
+        }
+        os << brackets.second << '\n';
+    }
+
+    return os;
+}
