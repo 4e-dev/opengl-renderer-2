@@ -87,20 +87,21 @@ class Vec {
 }; // Vec
 
 template <size_t N>
-std::ostream& operator<<(std::ostream& os, const Vec<N>& v) {
-    // always show some decimal points
-    os << std::fixed << std::setprecision(2);
-    os << "Vec<" << N << ">{ ";
-    size_t i{0};
-    for (const double val : v) {
+std::ostream& operator<<(std::ostream& stream, const Vec<N>& vec)
+{
+    // always show some fixed number of decimal points
+    stream << std::fixed << std::setprecision(2);
+    stream << "Vec<" << N << ">{ ";
+    for (size_t i{0}; i < vec.size(); ++i)
+    {
+        double val = vec[i];
         if (i > 0) {
-            os << ", ";
+            stream << ", ";
         }
-        os << val;
-        ++i;
+        stream << val;
     }
-    os << " }";
-    return os;
+    stream << " }";
+    return stream;
 }
 
 template <size_t N>
