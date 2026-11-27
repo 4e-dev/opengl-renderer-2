@@ -53,15 +53,14 @@
 #include <string>
 #include <vector>
 
-template <size_t N>
-requires (N >= 1)
-class Vec {
+template <size_t N> requires (N >= 1)
+class Vec
+{
     private:
         std::array<double, N> v{};
 
     public:
         Vec() = default;
-
         Vec(const std::array<double, N> values) : v(values) {}
 
         double operator[](const size_t i) const { return v[i]; }
@@ -102,82 +101,77 @@ std::ostream& operator<<(std::ostream& stream, const Vec<N>& vec)
 }
 
 template <size_t N>
-bool operator==(const Vec<N>& lhs, const Vec<N>& rhs) {
-    for (auto i : std::views::iota(0uz, N)) {
-        if (lhs[i] != rhs[i]) {
+bool operator==(const Vec<N>& lhs, const Vec<N>& rhs)
+{
+    for (size_t i{0}; i < N; ++i)
+        if (lhs[i] != rhs[i])
             return false;
-        }
-    }
     return true;
 }
 
 template <size_t N>
-bool operator!=(const Vec<N>& lhs, const Vec<N>& rhs) {
+bool operator!=(const Vec<N>& lhs, const Vec<N>& rhs)
+{
     return !(lhs == rhs);
 }
 
 template <size_t N>
-Vec<N> operator+(const Vec<N>& lhs, const Vec<N>& rhs) {
-    std::array<double, N> a{};
-    for (auto i : std::views::iota(0uz, N)) {
-        a[i] = lhs[i] + rhs[i];
-    }
-    return Vec<N>(a);
+Vec<N> operator+(const Vec<N>& lhs, const Vec<N>& rhs)
+{
+    Vec<N> v{};
+    for (size_t i{0}; i < N; ++i)
+        v[i] = lhs[i] + rhs[i];
+    return v;
 }
 
 template <size_t N>
-void operator+=(Vec<N>& lhs, const Vec<N>& rhs) {
-    for (auto i : std::views::iota(0uz, N)) {
+void operator+=(Vec<N>& lhs, const Vec<N>& rhs)
+{
+    for (size_t i{0}; i < N; ++i)
         lhs[i] += rhs[i];
-    }
 }
 
 template <size_t N>
-Vec<N> operator-(const Vec<N>& lhs, const Vec<N>& rhs) {
-    std::array<double, N> a{};
-    for (auto i : std::views::iota(0uz, N)) {
-        a[i] = lhs[i] - rhs[i];
-    }
-    return Vec<N>(a);
+Vec<N> operator-(const Vec<N>& lhs, const Vec<N>& rhs)
+{
+    return lhs + (rhs * -1);
 }
 
 template <size_t N>
-void operator-=(Vec<N>& lhs, Vec<N>& rhs) {
-    for (auto i : std::views::iota(0uz, N)) {
+void operator-=(Vec<N>& lhs, Vec<N>& rhs)
+{
+    for (size_t i{0}; i < N; ++i)
         lhs[i] -= rhs[i];
-    }
 }
 
 template <size_t N>
-Vec<N> operator*(const Vec<N>& v, const double scalar) {
-    std::array<double, N> a{};
-    for (auto i : std::views::iota(0uz, N)) {
-        a[i] = v[i] * scalar;
-    }
-    return Vec<N>(a);
+Vec<N> operator*(const Vec<N>& v, const double scalar)
+{
+    Vec<N> res{};
+    for (size_t i{0}; i < N; ++i)
+        res[i] = v[i] * scalar;
+    return res;
 }
 
 template <size_t N>
-Vec<N> operator*(const double scalar, const Vec<N>& v) {
+Vec<N> operator*(const double scalar, const Vec<N>& v)
+{
     return v * scalar;
 }
 
 template<size_t N>
-Vec<N> operator*=(Vec<N>& v, const double scalar) {
-    for (auto i : std::views::iota(0uz, N)) {
+Vec<N> operator*=(Vec<N>& v, const double scalar)
+{
+    for (size_t i{0}; i < N; ++i)
         v[i] *= scalar;
-    }
 }
 
 template<size_t N>
-Vec<N> operator/(const Vec<N>& v, const double scalar) {
-    std::array<double, N> a{};
-    for (auto i : std::views::iota(0uz, N)) {
+Vec<N> operator/(const Vec<N>& v, const double scalar)
+{
+    Vec<N> a{};
+    for (size_t i{0}; i < N; ++i)
         a[i] = v[i] / scalar;
-    }
-    return Vec<N>(a);
-}
-
     return a;
 }
 
@@ -214,9 +208,7 @@ VecType lerp(const VecType& start, const VecType& end, const double factor = 0.5
 // --------------------------------------------
 // TODO: working on matrix and matrix operators
 // --------------------------------------------
-
-template <size_t Rows, size_t Cols>
-requires (Rows >= 1 && Cols >= 1)
+template <size_t Rows, size_t Cols> requires (Rows >= 1 && Cols >= 1)
 class Mat {
     private:
         //std::array<std::array<double, Cols>, Rows> data;
