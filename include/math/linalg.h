@@ -182,16 +182,15 @@ Vec<N> operator/(const Vec<N>& v, const double scalar) {
 }
 
 template <typename VecType>
-STATIC_INLINE double dot(const VecType& lhs, const VecType& rhs) {
-    double result {0.0};
-    for (auto i : std::views::iota(0uz, VecType::dim)) {
-        result += (lhs[i] * rhs[i]);
-    }
-    return result;
+double dot(const VecType& lhs, const VecType& rhs) {
+    double v{0.0};
+    for (size_t i{0}; i < VecType::dim; ++i)
+        v += (lhs[i] * rhs[i]);
+    return v;
 }
 
 template <typename VecType>
-STATIC_INLINE double distance(const VecType& u, const VecType& v) {
+double distance(const VecType& u, const VecType& v) {
     double d{0.0};
     for (auto i : std::views::iota(0uz, VecType::dim)) {
         d += pow((u[i] - v[i]), 2);
@@ -199,18 +198,17 @@ STATIC_INLINE double distance(const VecType& u, const VecType& v) {
     return sqrt(d);
 }
 
-STATIC_INLINE double lerp(const double start, const double end, const double factor) {
+STATIC_INLINE
+double lerp(const double start, const double end, const double factor = 0.5) {
     return start + (end - start) * factor;
 }
 
 template <typename VecType>
-STATIC_INLINE VecType lerp(const VecType& start, const VecType& end, const double factor) {
-    const size_t N {VecType::dim};
-    std::array<double, N> a{};
-    for (auto i : std::views::iota(0uz, N)) {
-        a[i] = lerp(start[i], end[i], factor);
-    }
-    return VecType(a);
+VecType lerp(const VecType& start, const VecType& end, const double factor = 0.5) {
+    VecType v{};
+    for (size_t i{0}; i < VecType::dim; ++i)
+        v[i] = lerp(start[i], end[i], factor);
+    return v;
 }
 
 // --------------------------------------------
