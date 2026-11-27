@@ -67,10 +67,9 @@ class Vec {
         double operator[](const size_t i) const { return v[i]; }
         double& operator[](const size_t i) { return v[i]; }
 
-        // TODO: test these
-        //Vec& operator=(const Vec& other) { v = other; }
-        //Vec operator=(const Vec other) const { v = other; }
-
+        // TODO: need to test these
+        Vec& operator=(const Vec& other) { v = other; }
+        Vec operator=(const Vec other) const { v = other; }
 
         double x() const { return v[0]; }
         double y() const requires (N >= 2) { return v[1]; }
