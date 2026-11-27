@@ -76,8 +76,12 @@ class Vec {
         double z() const requires (N >= 3) { return v[2]; }
         double w() const requires (N >= 4) { return v[3]; }
 
-        static constexpr size_t dim = N;
-}; // Vec
+        const static size_t dim = N;
+};
+
+using Vec2 = Vec<2>();
+using Vec3 = Vec<3>();
+using Vec4 = Vec<4>();
 
 template <size_t N>
 std::ostream& operator<<(std::ostream& stream, const Vec<N>& vec)
