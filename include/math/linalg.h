@@ -72,11 +72,6 @@ class Vec {
         //Vec& operator=(const Vec& other) { v = other; }
         //Vec operator=(const Vec other) const { v = other; }
 
-        auto begin() { return v.begin(); }
-        auto begin() const { return v.begin(); }
-
-        auto end() { return v.end(); }
-        auto end() const { return v.end(); }
 
         double x() const { return v[0]; }
         double y() const requires (N >= 2) { return v[1]; }
