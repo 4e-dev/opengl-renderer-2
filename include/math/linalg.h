@@ -260,11 +260,11 @@ Mat<N, N> identity() {
 }
 
 template <size_t Rows, size_t Cols>
-std::ostream& operator<<(std::ostream& os, const Mat<Rows, Cols>& matrix) {
+std::ostream& operator<<(std::ostream& stream, const Mat<Rows, Cols>& matrix) {
     // always show some decimal points
-    os << std::fixed << std::setprecision(2);
+    stream << std::fixed << std::setprecision(2);
 
-    os << "Mat<" << Rows << ", " << Cols << "> = \n";
+    stream << "Mat<" << Rows << ", " << Cols << "> = \n";
 
     for (auto i : std::views::iota(0uz, Rows)) {
         std::pair<std::string, std::string> brackets{};
@@ -276,14 +276,14 @@ std::ostream& operator<<(std::ostream& os, const Mat<Rows, Cols>& matrix) {
         else
             brackets = {"⎢", "⎢"};
 
-        os << brackets.first << " ";
+        stream << brackets.first << " ";
         for (auto j : std::views::iota(0uz, Cols)) {
-            os << matrix[i][j] << " ";
+            stream << matrix[i][j] << " ";
         }
-        os << brackets.second << '\n';
+        stream << brackets.second << '\n';
     }
 
-    return os;
+    return stream;
 }
 
 template<size_t Rows, size_t Cols>
