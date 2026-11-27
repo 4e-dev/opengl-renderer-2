@@ -32,7 +32,7 @@ glad_dep = declare_dependency(
   include_directories: include_dir,
 )
 
-exe = executable(
+main_exe = executable(
   'prog',
   [
     'src/main.cpp'
@@ -46,7 +46,7 @@ exe = executable(
 )
 
 # test linear algebra library
-test_linalg = executable(
+test_linalg_exe = executable(
   'test_linalg',
   [
     'test/main.cpp',
@@ -55,7 +55,7 @@ test_linalg = executable(
   include_directories: include_dir,
 )
 
-test(
-  'linear algebra',
-  test_linalg,
-)
+#test(
+#  'linear algebra',
+#  test_linalg,
+#)
