@@ -1,8 +1,3 @@
-fixing up the file structure
-* move the linear algebra header files directly into the test folder
-
-
-
 test_linear_algebra file
 
 things i want to refactor
