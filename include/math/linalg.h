@@ -15,33 +15,34 @@
     Vec2 ─┐
     Vec3 ─┼─ arithmetic (add, subtract, multiply, divide) [x]
     Vec4 ─┘
-        ├─ dot [x]
-        ├─ length / normalize [x]
-        ├─ distance [x]
-        ├─ lerp [x]
+        ├─ dot                  [x]
+        ├─ length / normalize   [x]
+        ├─ distance             [x]
+        ├─ lerp                 [x]
+        ├─ cross                [ ]
 
 
-    (cross (Vec3), whwich is basically a 3x1 matrix)
     Mat3 ─┐
     Mat4 ─┼─ arithmetic
         ├─ matrix multiplication
         ├─ vector multiplication
         ├─ transpose
         ├─ determinant
-        └─ inverse
+        ├─ inverse
+        ├─ cross
 
     Mat4 ── translation
-        ── rotation
-        ── scale
-        ── perspective
-        ── orthographic
-        └── look_at
+        ├─ rotation
+        ├─ scale
+        ├─ perspective
+        ├─ orthographic
+        ├─ look_at
 
     Utilities
-        ├── radians / degrees
-        ├── clamp
-        ├── lerp
-        └── transform_point/vector
+        ├─ radians / degrees
+        ├─ clamp
+        ├─ lerp
+        ├─ transform_point/vector
 */
 
 #include <array>
@@ -68,8 +69,8 @@ class Vec {
         double& operator[](const size_t i) { return v[i]; }
 
         // TODO: test these
-        Vec& operator=(const Vec& other) { v = other; }
-        Vec operator=(const Vec other) const { v = other; }
+        //Vec& operator=(const Vec& other) { v = other; }
+        //Vec operator=(const Vec other) const { v = other; }
 
         auto begin() { return v.begin(); }
         auto begin() const { return v.begin(); }
@@ -266,6 +267,15 @@ class Mat {
         static constexpr size_t ncols = Cols;
 }; // Mat
 
+template <size_t N>
+Mat<N, N> identity() {
+    Mat<N, N> mat{};
+    for (auto i : std::views::iota(0uz, N)) {
+        mat[i][i] = 1.0;
+    }
+    return mat;
+}
+
 template <size_t Rows, size_t Cols>
 std::ostream& operator<<(std::ostream& os, const Mat<Rows, Cols>& matrix) {
     // always show some decimal points
@@ -291,4 +301,164 @@ std::ostream& operator<<(std::ostream& os, const Mat<Rows, Cols>& matrix) {
     }
 
     return os;
+}
+
+template<size_t Rows, size_t Cols>
+bool operator==(const Mat<Rows, Cols>& lhs, const Mat<Rows, Cols>& rhs) {
+    for (auto i : std::views::iota(0uz, Rows)) {
+        for (auto j : std::views::iota(0uz, Cols)) {
+            if (lhs[i][j] != rhs[i][j]) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+template<size_t Rows, size_t Cols>
+bool operator!=(const Mat<Rows, Cols>& lhs, const Mat<Rows, Cols>& rhs) {
+    return !(lhs == rhs);
+}
+
+// NOTE: matrices must be equal dimension for addition and subtraction operations
+template<size_t Rows, size_t Cols>
+Mat<Rows, Cols> operator+(const Mat<Rows, Cols>& lhs, const Mat<Rows, Cols>& rhs) {
+    Mat<Rows, Cols> result{};
+
+    for (auto i : std::views::iota(0uz, Rows)) {
+        for (auto j : std::views::iota(0uz, Cols)) {
+            result[i][j] = lhs[i][j] + rhs[i][j];
+        }
+    }
+
+    return result;
+}
+
+template<size_t Rows, size_t Cols>
+void operator+=(Mat<Rows, Cols>& lhs, const Mat<Rows, Cols>& rhs) {
+    for (auto i : std::views::iota(0uz, Rows)) {
+        for (auto j : std::views::iota(0uz, Cols)) {
+            lhs[i][j] += rhs[i][j];
+        }
+    }
+}
+
+template<size_t Rows, size_t Cols>
+Mat<Rows, Cols> operator-(const Mat<Rows, Cols>& lhs, const Mat<Rows, Cols>& rhs) {
+    Mat<Rows, Cols> result{};
+
+    for (auto i : std::views::iota(0uz, Rows)) {
+        for (auto j : std::views::iota(0uz, Cols)) {
+            result[i][j] = lhs[i][j] - rhs[i][j];
+        }
+    }
+
+    return result;
+}
+
+template<size_t Rows, size_t Cols>
+void operator-=(Mat<Rows, Cols>& lhs, const Mat<Rows, Cols>& rhs) {
+    for (auto i : std::views::iota(0uz, Rows)) {
+        for (auto j : std::views::iota(0uz, Cols)) {
+            lhs[i][j] -= rhs[i][j];
+        }
+    }
+}
+
+template<size_t Rows, size_t Cols>
+Mat<Rows, Cols> operator*(const Mat<Rows, Cols>& mat, const double scalar) {
+    Mat<Rows, Cols> scaled{};
+    for (auto i : std::views::iota(0uz, Rows)) {
+        for (auto j : std::views::iota(0uz, Cols)) {
+            scaled[i][j] = mat[i][j] * scalar;
+        }
+    }
+    return scaled;
+}
+
+template<size_t Rows, size_t Cols>
+Mat<Rows, Cols> operator*(const double scalar, const Mat<Rows, Cols>& mat) {
+    return mat * scalar;
+}
+
+template<size_t Rows, size_t Cols>
+void operator*=(Mat<Rows, Cols>& mat, const double scalar) {
+    for (auto i : std::views::iota(0uz, Rows)) {
+        for (auto j : std::views::iota(0uz, Cols)) {
+            mat[i][j] *= scalar;
+        }
+    }
+}
+
+template<size_t Rows, size_t Cols>
+Mat<Rows, Cols> operator/(const Mat<Rows, Cols>& mat, const double scalar) {
+    Mat<Rows, Cols> scaled{};
+    for (auto i : std::views::iota(0uz, Rows)) {
+        for (auto j : std::views::iota(0uz, Cols)) {
+            scaled[i][j] = mat[i][j] / scalar;
+        }
+    }
+    return scaled;
+}
+
+template<size_t Rows, size_t Cols>
+void operator/=(Mat<Rows, Cols>& mat, const double scalar) {
+    for (auto i : std::views::iota(0uz, Rows)) {
+        for (auto j : std::views::iota(0uz, Cols)) {
+            mat[i][j] /= scalar;
+        }
+    }
+}
+
+// matrix multiplication
+template<size_t Rows, size_t Inner, size_t Cols>
+Mat<Rows, Cols> operator*(
+    const Mat<Rows, Inner>& lhs,
+    const Mat<Inner, Cols>& rhs) {
+
+    /*
+       Implementing this was trickier than I thought.
+       It's helpful to think of indices `i` and `j` as the current 'destination' cells.
+       `k` is used to match the correct pair of elements.
+        */
+
+    Mat<Rows, Cols> result{};
+
+    // First two loops for destination of `result`
+    for (auto i : std::views::iota(0uz, Rows)) {
+        for (auto j : std::views::iota(0uz, Cols)) {
+            // Third loop for calculating result[i][j]
+            double sum{0.0};
+            for (auto k : std::views::iota(0uz, Inner)) {
+                sum += lhs[i][k] * rhs[k][j];
+            }
+            result[i][j] = sum;
+        }
+    }
+
+    return result;
+}
+
+// TODO: NEEDS TEST
+template<size_t Rows, size_t Cols>
+Vec<Rows> operator*(const Mat<Rows, Cols>& mat, const Vec<Cols>& vec) {
+    Vec<Rows> result{};
+    for (auto i : std::views::iota(0uz, Rows)) {
+        for (auto j : std::views::iota(0uz, Cols)) {
+            result[i] += mat[i][j] * vec[j];
+        }
+    }
+    return result;
+}
+
+// TODO: NEEDS TEST
+template<size_t Rows, size_t Cols>
+Vec<Cols> operator*(const Vec<Rows>& vec, const Mat<Rows, Cols>& mat) {
+    Vec<Cols> result{};
+    for (auto i : std::views::iota(0uz, Cols)) {
+        for (auto j : std::views::iota(0uz, Rows)) {
+            result[i] += mat[j][i] * vec[j];
+        }
+    }
+    return result;
 }

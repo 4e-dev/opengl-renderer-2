@@ -2,7 +2,7 @@
 #include <format>
 #include <print>
 
-#include "tests/test_linear_algebra.h"
+#include "test_linalg.h"
 
 using Test = std::array<unsigned, 2>(*)(); // pointer to a function
 
@@ -28,8 +28,9 @@ int main() {
     fail += run_test(test_vector<2>, "test_vector<2>");
     fail += run_test(test_vector<3>, "test_vector<3>");
     fail += run_test(test_vector<4>, "test_vector<4>");
-    fail += run_test(test_matrix<3, 3>, "test_matrix<3, 3>");
-    fail += run_test(test_matrix<4, 4>, "test_matrix<3, 3>");
+    fail += run_test(test_matrix_general<3, 3>, "test_matrix_general<3, 3>");
+    fail += run_test(test_matrix_general<4, 4>, "test_matrix_general<3, 3>");
+    fail += run_test(test_matrix_multiplication<1,2,3>, "test_matrix_multiplication<1,2,3>");
 
     if (fail == 0) {
         std::string mesg = "All tests passed!";

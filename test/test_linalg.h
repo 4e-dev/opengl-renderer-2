@@ -9,7 +9,7 @@
 #include <vector>
 
 // custom
-#include "math/linear_algebra.h"
+#include "math/linalg.h"
 #include "util/log.h"
 
 namespace TVec{
@@ -71,4 +71,7 @@ template <std::size_t N>
 std::array<unsigned, 2> test_vector();
 
 template <size_t Rows, size_t Cols>
-std::array<unsigned, 2> test_matrix();
+std::array<unsigned, 2> test_matrix_general();
+
+template <size_t Rows, size_t Inner, size_t Cols>
+std::array<unsigned, 2> test_matrix_multiplication();

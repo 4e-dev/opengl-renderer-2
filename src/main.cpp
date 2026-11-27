@@ -6,7 +6,7 @@
 #include <glfw/glfw3.h>
 
 // custom
-#include <math/linear_algebra.h>
+#include <math/linalg.h>
 #include <util/log.h>
 
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
