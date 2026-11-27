@@ -178,22 +178,7 @@ Vec<N> operator/(const Vec<N>& v, const double scalar) {
     return Vec<N>(a);
 }
 
-template<size_t N>
-Vec<N> component_multiply(const Vec<N>& lhs, const Vec<N>& rhs) {
-    std::array<double, N> a{};
-    for (auto i : std::views::iota(0uz, N)) {
-        a[i] = lhs[i] * rhs[i];
-    }
-    return Vec<N>(a);
-}
-
-template<size_t N>
-Vec<N> component_divide(const Vec<N>& lhs, const Vec<N>& rhs) {
-    std::array<double, N> a{};
-    for (auto i : std::views::iota(0uz, N)) {
-        a[i] = lhs[i] / rhs[i];
-    }
-    return Vec<N>(a);
+    return a;
 }
 
 template <typename VecType>
